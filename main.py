@@ -1,7 +1,7 @@
 import pygame  # Mengimpor pustaka pygame untuk membuat game
 import sys  # Mengimpor sys untuk menangani keluarnya program
 import random  # Mengimpor random untuk menghasilkan posisi apel secara acak
-import time
+import time  # Mengimpor time untuk menambahkan delay dalam game
 
 # Inisialisasi pygame
 check_errors = pygame.init()
@@ -15,12 +15,14 @@ pygame.display.set_caption('Snake Game')
 
 # Membuat jendela game dengan ukuran yang telah ditentukan
 game_window = pygame.display.set_mode((frame_size_x, frame_size_y))
+
+# Mengontrol kecepatan frame per detik
 fps_controller = pygame.time.Clock()
 
 # Menentukan arah awal pergerakan ular
 direction = 'RIGHT'
 change_to = direction  # Variabel untuk menyimpan perubahan arah
-score = 0
+score = 0  # Variabel untuk menyimpan skor
 
 # Inisialisasi posisi awal ular
 snake_pos = [100, 50]  # Posisi awal kepala ular
@@ -38,6 +40,7 @@ green = pygame.Color(0, 255, 0)  # Warna hijau untuk ular
 blue = pygame.Color(0, 0, 255)  # Warna biru
 
 def game_over():
+    """Menampilkan layar game over dan keluar dari permainan"""
     my_font = pygame.font.SysFont('Arial', 90)
     game_over_surface = my_font.render('YOU DIED', True, red)
     game_over_rect = game_over_surface.get_rect()
@@ -68,6 +71,7 @@ while True:
             if event.key == pygame.K_ESCAPE:  # Jika tombol ESC ditekan, keluar dari game
                 pygame.event.post(pygame.event.Event(pygame.QUIT))
 
+    # Mengubah arah berdasarkan input, dengan memastikan ular tidak bisa berbalik arah 180 derajat
     if change_to == 'UP' and direction != 'DOWN':
         direction = 'UP'
     if change_to == 'DOWN' and direction != 'UP':
@@ -76,6 +80,8 @@ while True:
         direction = 'LEFT'
     if change_to == 'RIGHT' and direction != 'LEFT':
         direction = 'RIGHT'
+
+    # Memindahkan kepala ular sesuai arah
     if direction == 'UP':
         snake_pos[1] -= 10
     if direction == 'DOWN':
@@ -84,10 +90,10 @@ while True:
         snake_pos[0] -= 10
     if direction == 'RIGHT':
         snake_pos[0] += 10
+
     # Mengisi layar dengan warna putih sebagai latar belakang
     game_window.fill(white)
-    print(change_to)  # Menampilkan arah pergerakan di terminal
-
+    
     # Menambahkan posisi baru ke tubuh ular
     snake_body.insert(0, list(snake_pos))
     if snake_pos[0] == apple_pos[0] and snake_pos[1] == apple_pos[1]:
@@ -107,19 +113,27 @@ while True:
     
     # Menggambar apel di layar
     pygame.draw.rect(game_window, red, pygame.Rect(apple_pos[0], apple_pos[1], 10, 10)) 
+    
+    # Mengecek apakah ular menabrak dinding
     if snake_pos[0] < 0 or snake_pos[0] > frame_size_x-10:
         game_over()
     if snake_pos[1] < 0 or snake_pos[1] > frame_size_y-10:
         game_over()
+    
+    # Mengecek apakah ular menabrak tubuhnya sendiri
     for block in snake_body[1:]:
         if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
             game_over()
     
-    # Memperbarui tampilan game
+    # Menampilkan skor di layar
     score_font = pygame.font.SysFont('Arial', 20)
     score_surface = score_font.render('Score : ' + str(score), True, black)
     score_rect = score_surface.get_rect()
     score_rect.midtop = (72, 15)
     game_window.blit(score_surface, score_rect)
+    
+    # Memperbarui tampilan game
     pygame.display.update()
+    
+    # Mengatur kecepatan game
     fps_controller.tick(10)
